@@ -61,10 +61,16 @@ def Calculate_qity(graph):
     Args:
         graph (networkx.Graph): The input graph.
 
-    Returns:
-        float: The average degree of the graph.
     """
-    qity = graph.number_of_edges() / len(graph)
+    avg_degree = graph.number_of_edges() / len(graph)
+
+    betweenness_centrality = nx.betweenness_centrality(graph)
+    max_betweenness = max(betweenness_centrality.values())
+
+    communities = list(nx.algorithms.community.greedy_modularity_communities(graph))
+    modularity = nx.algorithms.community.modularity(graph, communities)
+    alpha = 0.5
+    qity = avg_degree * (1 - max_betweenness) + α * modularity
     return qity
 
 def Calculate_purity(graph):
@@ -96,10 +102,10 @@ def Calculate_qity_purity(graph):
         float: The combined metric of average degree and purity.
     """
     purity = Calculate_purity(graph)
-    avg_degree = graph.number_of_edges() / len(graph)
+    qity_ = Calculate_qity(graph)
     if purity == 1:
         return avg_degree
-    qity = avg_degree / (1 - purity)
+    qity = qity_ / (1 - purity)
     return qity
 
 def split_ball_split(graph):
